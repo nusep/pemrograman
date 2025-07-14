@@ -1,0 +1,65 @@
+from flask import Flask, request
+from flask import render_template_string
+
+app = Flask(_name_)
+
+# Daftar mobil
+mobil_list = [
+    {'id': 1, 'nama': 'Toyota Avanza', 'harga': '180 juta'},
+    {'id': 2, 'nama': 'Honda Brio', 'harga': '160 juta'},
+    {'id': 3, 'nama': 'Suzuki Ertiga', 'harga': '175 juta'}
+]
+
+# Halaman utama
+halaman_utama = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bangjek | Jual Beli Mobil</title>
+</head>
+<body>
+    <h1>Selamat Datang di Bangjek</h1>
+    <h2>Daftar Mobil Dijual:</h2>
+    <ul>
+        {% for m in mobil %}
+        <li>
+            <strong>{{ m.nama }}</strong> - Harga: {{ m.harga }}
+            [<a href="/beli/{{ m.id }}">Beli</a>]
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+'''
+
+# Halaman pembelian
+halaman_beli = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bangjek - Pembelian</title>
+</head>
+<body>
+    {% if mobil %}
+        <h2>Terima kasih sudah membeli <u>{{ mobil.nama }}</u>!</h2>
+        <p>Harga: {{ mobil.harga }}</p>
+        <a href="/">Kembali ke daftar mobil</a>
+    {% else %}
+        <p>Mobil tidak ditemukan.</p>
+        <a href="/">Kembali</a>
+    {% endif %}
+</body>
+</html>
+'''
+
+@app.route('/')
+def index():
+    return render_template_string(halaman_utama, mobil=mobil_list)
+
+@app.route('/beli/<int:id_mobil>')
+def beli(id_mobil):
+    mobil = next((m for m in mobil_list if m['id'] == id_mobil), None)
+    return render_template_string(halaman_beli, mobil=mobil)
+
+if _name_ == '_main_':
+    app.run(debug=True)
